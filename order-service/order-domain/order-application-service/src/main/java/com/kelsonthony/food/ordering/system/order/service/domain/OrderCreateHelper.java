@@ -12,6 +12,7 @@ import com.kelsonthony.food.ordering.system.order.service.domain.ports.outputs.r
 import com.kelsonthony.food.ordering.system.order.service.domain.ports.outputs.repository.OrderRepository;
 import com.kelsonthony.food.ordering.system.order.service.domain.ports.outputs.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,16 +29,20 @@ public class OrderCreateHelper {
 
     private final OrderDataMapper orderDataMapper;
 
+    //private final ApplicationDomainEventPublisher applicationDomainEventPublisher;
+
     public OrderCreateHelper(OrderDomainService orderDomainService,
                              OrderRepository orderRepository,
                              CustomerRepository customerRepository,
                              RestaurantRepository restaurantRepository,
-                             OrderDataMapper orderDataMapper) {
+                             OrderDataMapper orderDataMapper,
+                             ApplicationDomainEventPublisher applicationDomainEventPublisher) {
         this.orderDomainService = orderDomainService;
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.restaurantRepository = restaurantRepository;
         this.orderDataMapper = orderDataMapper;
+        //this.applicationDomainEventPublisher = applicationDomainEventPublisher;
     }
 
     @Transactional
@@ -48,6 +53,7 @@ public class OrderCreateHelper {
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
         saveOrder(order);
         log.info("Order in Helper is created with id: '{}'", orderCreatedEvent.getOrder().getId().getValue());
+        //applicationDomainEventPublisher.publish(orderCreatedEvent);
         return orderCreatedEvent;
     }
 
